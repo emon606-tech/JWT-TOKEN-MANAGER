@@ -11,6 +11,8 @@ router.get('/tokens/github', tokenController.getGitHubTokens);
 
 // Test routes
 router.get('/test/guest-accounts', tokenController.testGuestAccounts);
+router.get('/test/github-update', tokenController.testGitHubUpdate);
+router.get('/test/discord-file-upload', tokenController.testDiscordFileUpload);
 
 // Scheduler routes
 router.get('/scheduler/status', tokenController.getSchedulerStatus);
