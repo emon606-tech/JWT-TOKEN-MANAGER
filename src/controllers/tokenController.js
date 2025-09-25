@@ -157,6 +157,70 @@ class TokenController {
       });
     }
   }
+
+  async testGitHubUpdate(req, res) {
+    try {
+      logger.info('Testing GitHub update...');
+      
+      // Generate a small test token set
+      const testTokens = [
+        { "token": "test-token-1" },
+        { "token": "test-token-2" },
+        { "token": "test-token-3" }
+      ];
+      
+      const result = await githubService.updateTokenFile(testTokens);
+      
+      res.json({
+        success: result,
+        message: result ? 'GitHub update successful' : 'GitHub update failed',
+        data: {
+          tokenCount: testTokens.length,
+          githubUpdated: result
+        }
+      });
+
+    } catch (error) {
+      logger.error('Error in testGitHubUpdate:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to test GitHub update',
+        error: error.message
+      });
+    }
+  }
+
+  async testDiscordFileUpload(req, res) {
+    try {
+      logger.info('Testing Discord file upload...');
+      
+      // Generate a small test token set
+      const testTokens = [
+        { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test1" },
+        { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test2" },
+        { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test3" }
+      ];
+      
+      const result = await discordService.sendTokensToDiscord(testTokens);
+      
+      res.json({
+        success: result,
+        message: result ? 'Discord file upload successful' : 'Discord file upload failed',
+        data: {
+          tokenCount: testTokens.length,
+          discordSent: result
+        }
+      });
+
+    } catch (error) {
+      logger.error('Error in testDiscordFileUpload:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to test Discord file upload',
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new TokenController();
