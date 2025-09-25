@@ -9,6 +9,9 @@ router.get('/tokens', tokenController.getTokens);
 router.post('/tokens/refresh', tokenController.refreshTokens);
 router.get('/tokens/github', tokenController.getGitHubTokens);
 
+// Test routes
+router.get('/test/guest-accounts', tokenController.testGuestAccounts);
+
 // Scheduler routes
 router.get('/scheduler/status', tokenController.getSchedulerStatus);
 
