@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 const path = require('path');
+const axios = require('axios');
 const config = require('../utils/config');
 const logger = require('../utils/logger');
 
@@ -60,11 +61,56 @@ class JWTService {
         logger.error('Error listing directory contents:', listError.message);
       }
       
-      throw new Error('Guest accounts file not found in any expected location');
+      // Try to download from GitHub as fallback
+      logger.info('Attempting to download guest accounts from GitHub...');
+      try {
+        accounts = await this.downloadGuestAccountsFromGitHub();
+        logger.info(`Successfully downloaded ${accounts.length} guest accounts from GitHub`);
+        return accounts;
+      } catch (downloadError) {
+        logger.error('Failed to download from GitHub:', downloadError.message);
+        throw new Error('Guest accounts file not found in any expected location and GitHub download failed');
+      }
     }
 
     logger.info(`Successfully loaded ${accounts.length} guest accounts from: ${usedPath}`);
     return accounts;
+  }
+
+  async downloadGuestAccountsFromGitHub() {
+    try {
+      const githubUrl = `https://raw.githubusercontent.com/${config.github.owner}/${config.github.repo}/main/data/guest_accounts.json`;
+      logger.info(`Downloading from: ${githubUrl}`);
+      
+      const response = await axios.get(githubUrl, {
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'JWT-Token-Manager/1.0.0'
+        }
+      });
+      
+      if (response.status === 200) {
+        const accounts = response.data;
+        logger.info(`Downloaded ${accounts.length} guest accounts from GitHub`);
+        
+        // Try to save locally for future use
+        try {
+          const localPath = path.join(process.cwd(), 'data/guest_accounts.json');
+          await fs.mkdir(path.dirname(localPath), { recursive: true });
+          await fs.writeFile(localPath, JSON.stringify(accounts, null, 2));
+          logger.info('Saved guest accounts locally for future use');
+        } catch (saveError) {
+          logger.warn('Could not save guest accounts locally:', saveError.message);
+        }
+        
+        return accounts;
+      } else {
+        throw new Error(`GitHub API returned status: ${response.status}`);
+      }
+    } catch (error) {
+      logger.error('Error downloading from GitHub:', error.message);
+      throw error;
+    }
   }
 
   generateJWT(guestAccount) {
