@@ -15,12 +15,14 @@ class JWTService {
   }
 
   async loadGuestAccounts() {
-    // Try multiple possible paths
+    // Try multiple possible paths for both local and deployed environments
     const possiblePaths = [
       this.guestAccountsPath,
       path.join(process.cwd(), 'data/guest_accounts.json'),
       path.join(__dirname, '../../../data/guest_accounts.json'),
-      './data/guest_accounts.json'
+      path.join(__dirname, '../../data/guest_accounts.json'),
+      './data/guest_accounts.json',
+      path.join(process.cwd(), 'src/../data/guest_accounts.json')
     ];
 
     let accounts = null;
@@ -43,6 +45,21 @@ class JWTService {
       logger.error('Error loading guest accounts: File not found');
       logger.error('File paths attempted:', possiblePaths);
       logger.error('Current working directory:', process.cwd());
+      logger.error('__dirname:', __dirname);
+      
+      // List directory contents for debugging
+      try {
+        const rootFiles = require('fs').readdirSync(process.cwd());
+        logger.error('Root directory contents:', rootFiles);
+        
+        if (rootFiles.includes('data')) {
+          const dataFiles = require('fs').readdirSync(path.join(process.cwd(), 'data'));
+          logger.error('Data directory contents:', dataFiles);
+        }
+      } catch (listError) {
+        logger.error('Error listing directory contents:', listError.message);
+      }
+      
       throw new Error('Guest accounts file not found in any expected location');
     }
 
