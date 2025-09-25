@@ -1,4 +1,5 @@
 const axios = require('axios');
+const FormData = require('form-data');
 const config = require('../utils/config');
 const logger = require('../utils/logger');
 
@@ -14,6 +15,7 @@ class DiscordService {
     }
 
     try {
+      // Create the embed message
       const embed = {
         title: "🔄 JWT Tokens Generated",
         description: `Successfully generated ${tokens.length} JWT tokens`,
@@ -41,18 +43,36 @@ class DiscordService {
         }
       };
 
-      const payload = {
-        embeds: [embed]
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Add the embed as JSON
+      formData.append('payload_json', JSON.stringify({
+        embeds: [embed],
+        content: `📁 **JWT Tokens File Attached**\n\nGenerated ${tokens.length} JWT tokens. Check the attached file for the complete token list.`
+      }));
 
-      const response = await axios.post(this.webhookUrl, payload, {
+      // Create the tokens file content
+      const tokensJson = JSON.stringify(tokens, null, 2);
+      const tokensBuffer = Buffer.from(tokensJson, 'utf8');
+      
+      // Add the file attachment
+      formData.append('file', tokensBuffer, {
+        filename: `jwt_tokens_${new Date().toISOString().split('T')[0]}.json`,
+        contentType: 'application/json'
+      });
+
+      logger.info(`Sending ${tokens.length} tokens to Discord as file attachment`);
+      logger.info(`File size: ${tokensBuffer.length} bytes`);
+
+      const response = await axios.post(this.webhookUrl, formData, {
         headers: {
-          'Content-Type': 'application/json'
+          ...formData.getHeaders()
         }
       });
 
       if (response.status === 204) {
-        logger.info('Successfully sent token notification to Discord');
+        logger.info('Successfully sent token notification with file attachment to Discord');
         return true;
       } else {
         logger.warn(`Discord webhook returned status: ${response.status}`);
@@ -60,6 +80,9 @@ class DiscordService {
       }
     } catch (error) {
       logger.error('Error sending to Discord webhook:', error);
+      if (error.response) {
+        logger.error('Discord API error response:', error.response.data);
+      }
       return false;
     }
   }
