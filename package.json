@@ -2,9 +2,9 @@
   "name": "jwt-token-manager",
   "version": "1.0.0",
   "description": "JWT Token Management Server with Discord Webhook and GitHub Integration",
-  "main": "app.js",
+  "main": "start.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node start.js",
     "dev": "nodemon app.js",
     "test": "jest"
   },
