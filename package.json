@@ -1,0 +1,38 @@
+{
+  "name": "jwt-token-manager",
+  "version": "1.0.0",
+  "description": "JWT Token Management Server with Discord Webhook and GitHub Integration",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.6.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "jwt",
+    "token",
+    "discord",
+    "webhook",
+    "github",
+    "api"
+  ],
+  "author": "emon606-tech",
+  "license": "MIT"
+}

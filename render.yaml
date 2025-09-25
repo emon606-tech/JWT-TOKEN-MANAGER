@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: jwt-token-manager
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        value: e0d1aa5fcc75b76942258e9ed122b363c3f580765d8997f5ccaa18f6ba6c7966a6eb15eea81e1cc0e09ff69c7dc46751ffc15b8d8a5f31483ef6fabf13bcc559
+      - key: JWT_EXPIRES_IN
+        value: 4h
+      - key: DISCORD_WEBHOOK_URL
+        value: https://discord.com/api/webhooks/1419650642955468942/kISe1BKybH6UbqRab1PqtFQlbljnoe87umayipGZekAktPMdUcfD5OdYX-F4ITzdP9ek
+      - key: GITHUB_TOKEN
+        value: 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
+      - key: GITHUB_OWNER
+        value: emon606-tech
+      - key: GITHUB_REPO
+        value: free-fire-like-api
+      - key: GITHUB_FILE_PATH
+        value: tokens/token_bd.json
+      - key: TOKEN_REFRESH_INTERVAL
+        value: "0 */4 * * *"
+      - key: LOG_LEVEL
+        value: info
