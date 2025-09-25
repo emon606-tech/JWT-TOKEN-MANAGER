@@ -8,16 +8,46 @@ class JWTService {
   constructor() {
     this.guestAccountsPath = path.join(__dirname, '../../data/guest_accounts.json');
     this.generatedTokensPath = path.join(__dirname, '../../data/generated_tokens.json');
+    
+    // Log the paths for debugging
+    logger.info('Guest accounts path:', this.guestAccountsPath);
+    logger.info('Generated tokens path:', this.generatedTokensPath);
   }
 
   async loadGuestAccounts() {
-    try {
-      const data = await fs.readFile(this.guestAccountsPath, 'utf8');
-      return JSON.parse(data);
-    } catch (error) {
-      logger.error('Error loading guest accounts:', error);
-      throw new Error('Failed to load guest accounts');
+    // Try multiple possible paths
+    const possiblePaths = [
+      this.guestAccountsPath,
+      path.join(process.cwd(), 'data/guest_accounts.json'),
+      path.join(__dirname, '../../../data/guest_accounts.json'),
+      './data/guest_accounts.json'
+    ];
+
+    let accounts = null;
+    let usedPath = null;
+
+    for (const filePath of possiblePaths) {
+      try {
+        await fs.access(filePath);
+        logger.info(`Guest accounts file found at: ${filePath}`);
+        const data = await fs.readFile(filePath, 'utf8');
+        accounts = JSON.parse(data);
+        usedPath = filePath;
+        break;
+      } catch (err) {
+        logger.debug(`File not found at: ${filePath}`);
+      }
     }
+
+    if (!accounts) {
+      logger.error('Error loading guest accounts: File not found');
+      logger.error('File paths attempted:', possiblePaths);
+      logger.error('Current working directory:', process.cwd());
+      throw new Error('Guest accounts file not found in any expected location');
+    }
+
+    logger.info(`Successfully loaded ${accounts.length} guest accounts from: ${usedPath}`);
+    return accounts;
   }
 
   generateJWT(guestAccount) {
