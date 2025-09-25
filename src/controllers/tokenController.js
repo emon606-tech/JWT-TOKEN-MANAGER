@@ -133,6 +133,30 @@ class TokenController {
       });
     }
   }
+
+  async testGuestAccounts(req, res) {
+    try {
+      logger.info('Testing guest accounts loading...');
+      const accounts = await jwtService.loadGuestAccounts();
+      
+      res.json({
+        success: true,
+        message: 'Guest accounts loaded successfully',
+        data: {
+          count: accounts.length,
+          sample: accounts.slice(0, 3) // Show first 3 accounts
+        }
+      });
+
+    } catch (error) {
+      logger.error('Error in testGuestAccounts:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to load guest accounts',
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new TokenController();
